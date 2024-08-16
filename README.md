@@ -75,3 +75,8 @@ Nest is [MIT licensed](LICENSE).
 ## API Documents
 [https://restful-nest.onrender.com/api](https://restful-nest.onrender.com/api)
 
+## .env example 
+```.env
+// .env
+DATABASE_URL="postgres://myuser:mypassword@localhost:5432/db-name"
+```
