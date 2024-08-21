@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
@@ -8,14 +18,16 @@ import { ArticleEntity } from './entities/article.entity';
 @Controller('articles')
 @ApiTags('articles')
 export class ArticlesController {
-  constructor(private readonly articlesService: ArticlesService) { }
+  constructor(private readonly articlesService: ArticlesService) {}
 
   @Post()
   @ApiCreatedResponse({ type: ArticleEntity })
   async create(@Body() createArticleDto: CreateArticleDto) {
-    return new ArticleEntity(
-      await this.articlesService.create(createArticleDto),
-    );
+    const article = await this.articlesService.create(createArticleDto);
+    console.log('article', article);
+    // return new ArticleEntity(
+    //   await this.articlesService.create(createArticleDto),
+    // );
   }
 
   @Get('drafts')
@@ -34,13 +46,20 @@ export class ArticlesController {
 
   @Get(':id')
   @ApiOkResponse({ type: ArticleEntity })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    return new ArticleEntity(await this.articlesService.findOne(id));
+  async findOne(@Param('id') id: string) {
+    const data = await this.articlesService.findOne(Number(id));
+    if (!data) {
+      throw new NotFoundException(`Article with ID ${id} is not found`);
+    }
+    return data;
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
-  async update(@Param('id', ParseIntPipe) id: number, @Body() updateArticleDto: UpdateArticleDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateArticleDto: UpdateArticleDto,
+  ) {
     return new ArticleEntity(
       await this.articlesService.update(id, updateArticleDto),
     );

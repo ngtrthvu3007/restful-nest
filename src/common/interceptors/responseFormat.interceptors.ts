@@ -14,6 +14,7 @@ export class ResponseFormatInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     const statusCode = response.statusCode;
+
     return next.handle().pipe(
       map((data) => ({
         statusCode,
@@ -24,6 +25,9 @@ export class ResponseFormatInterceptor implements NestInterceptor {
         data,
       })),
       catchError((err) => {
+        if (err.code === 'P2002') {
+          return throwError(() => err); // throw error for exception filter
+        }
         const { response } = err;
         const statusCode = response.statusCode || 500;
         const errorResponse = {
